@@ -235,5 +235,7 @@ void Sock5Server::ReadEventHandle(int connectfd)
 int main()
 {
 	Sock5Server server(8001);
-	server.Start();
+  server.Start();
+  return 0;
 }
+
