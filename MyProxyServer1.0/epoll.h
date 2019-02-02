@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+#include "encry.h"
+
 class IgnoreSigPipe
 {
 public:

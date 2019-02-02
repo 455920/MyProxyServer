@@ -7,3 +7,7 @@ tranfer:tranfer.cc epoll.cc
 
 socks5:socks5.cc epoll.cc
 	g++ -o $@ $^
+
+.PHONY:clean 
+clean:
+	rm - tranfer socks5

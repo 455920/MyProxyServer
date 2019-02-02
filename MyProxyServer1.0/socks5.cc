@@ -34,12 +34,13 @@ int Sock5Server::AuthHandle(int fd)
 	else
 	{
 		recv(fd, buf, rlen, 0);
-
+    Decrypt(buf,rlen);
 		if (buf[0] != 0x05)
 		{
 			ErrorLog("not socks5");
 			return -1;
 		}
+    TraceLog("socks5 is right");
 
 		return 1;
 	}
@@ -64,25 +65,33 @@ int Sock5Server::EstablishmentHandle(int fd)
 	{
 		char ip[4];
 		char port[2];
-
+    TraceLog("analyze ip and port")
     //先读取4个字节
 		recv(fd, buf, 4, 0);
+    Decrypt(buf,4);
    //判断协议
 		char addresstype = buf[3];
+
 		if (addresstype == 0x01) // ipv4
 		{
+      TraceLog("addresstype is ipv4");
 			recv(fd, ip, 4, 0);//读取四个字节，这四个字节就是IP
+      Decrypt(ip,4);
 
 			recv(fd, port, 2, 0);//读取端口号
+      Decrypt(port,2);
 		}
 		else if (addresstype == 0x03) //domainname 收到的是域名
 		{
+      TraceLog("addresstype is domainame");
 			char len = 0;
 			// recv domainname
 			recv(fd, &len, 1, 0);//第一个字节是域名的长度
+      Decrypt(&len,1);
 
 			recv(fd, buf, len, 0);//感觉域名的长度来读取完整对的域名
 			buf[len] = '\0';
+      Decrypt(buf,len);
 
 
       //打印追踪日志
@@ -90,7 +99,7 @@ int Sock5Server::EstablishmentHandle(int fd)
 
 			// 读取后面的端口号
 			recv(fd, port, 2, 0);
-
+      Decrypt(port,2);
 			TraceLog("decrypt domainname:%s", buf);
       
      //调用域名获取IP
@@ -161,6 +170,8 @@ void Sock5Server::ReadEventHandle(int connectfd)
 				reply[1] = 0xFF;
 				RemoveConnect(connectfd);
 			}
+      
+      Encry(reply,2);
 
 			if (send(connectfd, reply, 2, 0) != 2)
 			{
@@ -188,6 +199,8 @@ void Sock5Server::ReadEventHandle(int connectfd)
 				reply[1] = 0x00;
 				reply[3] = 0x01;
 			}
+
+      Encry(reply,10);
 
 			if(send(connectfd, reply, 10, 0) != 10)
 			{

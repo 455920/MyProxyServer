@@ -140,10 +140,12 @@ void EpollServer::Forwarding(Channel* clientChannel, Channel* serverChannel,
       //加密服务器接受浏览器的socks数据包后，需要先进行解密，然后再把消息转发给socks5
 		if (recvdecrypt)
 		{
+      Encry(buf,rlen);  
 		}
       //加密服务器接收socks服务器返回的目标服务器请求的时候，需要先解密，再转发给浏览器
 		if (sendencry)
 		{
+      Decrypt(buf,rlen);
 		}
 
 		buf[rlen] = '\0';
